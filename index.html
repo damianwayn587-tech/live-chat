@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Damien Live Chat</title>
+</head>
+<body>
+
+<h2>Live Chat</h2>
+
+<input type="text" id="messageInput" placeholder="Type message">
+<button onclick="sendMessage()">Send</button>
+
+<ul id="messages"></ul>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy }from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+  apiKey: "AIzaSyCE-XaWF9eUMkMBdMDcHgBSND17OlswQh0",
+  authDomain: "mysterydamien-6ebf6.firebaseapp.com",
+  projectId: "mysterydamien-6ebf6",
+  storageBucket: "mysterydamien-6ebf6.firebasestorage.app",
+  messagingSenderId: "143023867275",
+  appId: "1:143023867275:web:0c6a8685bbb23634a69b8e",
+  measurementId: "G-L39VD3CBG3"
+};
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.sendMessage = async function () {
+    const input = document.getElementById("messageInput");
+    if (input.value !== "") {
+      await addDoc(collection(db, "messages"), {
+        text: input.value,
+        time: Date.now()
+      });
+      input.value = "";
+    }
+  };
+
+  const messagesList = document.getElementById("messages");
+
+  const q = query(collection(db, "messages"), orderBy("time"));
+
+onSnapshot(q, (snapshot) => {
+    messagesList.innerHTML = "";
+    snapshot.forEach((doc) => {
+      const li = document.createElement("li");
+      li.textContent = doc.data().text;
+      messagesList.appendChild(li);
+    });
+  });
+</script>
+
+</body>
+</html>
